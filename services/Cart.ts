@@ -18,6 +18,7 @@ export async function addToCart(payload: AddToCartRequest): Promise<AddToCartRes
     throw new Error(message);
   }
 
+
   const data: AddToCartResponse = await response.json();
   return data;
 }
