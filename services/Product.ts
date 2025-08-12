@@ -13,3 +13,6 @@ export const fetchProducts = async (): Promise<Product[]> => {
     return json.data as Product[];
 };
 
+
+
+
