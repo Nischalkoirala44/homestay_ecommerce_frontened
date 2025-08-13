@@ -20,6 +20,7 @@ const ProductCard = () => {
       try {
         const response = await fetchProducts()
         setProducts(response)
+        console.log(response)
       } catch (err: any) {
         setError(err.message)
       } finally {
@@ -79,55 +80,53 @@ const ProductCard = () => {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-1">
-      {products.map((product) => (
-        <div
-          key={product.id}
-          className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow duration-200"
-        >
-          {/* Product Image */}
-          <div className="aspect-square bg-slate-50 relative overflow-hidden">
-            <Image
-              src={product.image || "/placeholder.svg"}
-              alt={product.name}
-              fill
-              className="object-cover hover:scale-105 transition-transform duration-300"
-              unoptimized
-              priority
-            />
-          </div>
-
-          {/* Product Info */}
-          <div className="p-4">
-            <h3 className="font-semibold text-slate-900 text-lg mb-2 line-clamp-2">{product.name}</h3>
-
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-2xl font-bold text-emerald-600">${product.price}</span>
-            </div>
-
-            {/* Add to Cart Button */}
-            <button
-              onClick={() => handleAddToCart(Number(product.id))}
-              disabled={addingToCart === Number(product.id)}
-              className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 group"
-            >
-              {addingToCart === Number(product.id) ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Adding...
-                </>
-              ) : (
-                <>
-                  <ShoppingCart className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" />
-                  Add to Cart
-                </>
-              )}
-            </button>
-          </div>
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 p-4">
+    {products.map((product) => (
+      <div
+        key={product.id}
+        className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col"
+      >
+        {/* Product Image */}
+        <div className="relative w-full aspect-square bg-white p-4">
+          <Image
+            src={product.image || "/placeholder.svg"}
+            alt={product.name}
+            fill
+            unoptimized
+            priority
+            className="object-contain"
+          />
         </div>
-      ))}
-    </div>
-  )
+
+        {/* Product Info */}
+        <div className="p-4 flex flex-col flex-grow border-t">
+          <p className="text-gray-500 text-sm mb-1">{product.name}</p>
+
+          <h3
+            className="text-lg font-semibold text-gray-800 mb-2 line-clamp-2"
+            title={product.description}
+          >
+            {product.description}
+          </h3>
+
+          <div className="text-gray-800 font-medium text-lg mb-4">
+            Rs. {product.price.toLocaleString()}
+          </div>
+
+          {/* Buy Options Button */}
+          <button
+            onClick={() => handleAddToCart(Number(product.id))}
+            disabled={addingToCart === Number(product.id)}
+            className="mt-auto w-full border border-green-400 bg-green-400 text-white hover:bg-orange-50 font-medium py-2 px-4 rounded-lg transition-all duration-200"
+          >
+            {addingToCart === Number(product.id) ? "Adding..." : "Add to cart"}
+          </button>
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
 }
 
 export default ProductCard

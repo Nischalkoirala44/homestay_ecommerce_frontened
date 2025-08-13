@@ -21,25 +21,35 @@ export default function Home() {
       {/* Fixed Header */}
       <Header />
 
-      {/* Main content with padding-top to offset fixed header height */}
-      <div className="pt-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center overflow-x-hidden">
-        {user ? (
-          <>
-            <main className="min-h-screen bg-slate-50 rounded-md p-4">
-              <div className="text-center mb-6">
-                <h1 className="text-3xl font-bold text-slate-900 mb-2">Our Products</h1>
-                <p className="text-slate-600">Discover our amazing collection</p>
-              </div>
-              <ProductCard />
-            </main>
-          </>
-        ) : (
-          <>
-            <h1 className="text-4xl font-bold mb-6">Welcome to Home Stay</h1>
-            <p className="text-xl mb-8">Find the Product</p>
-          </>
-        )}
+      <div className="pt-20 px-4 sm:px-6 lg:px-8">
+  {user ? (
+    <>
+      <main>
+        <div className="text-center mb-10">
+          <h1 className="text-4xl font-bold text-gray-900">
+            Our Products
+          </h1>
+          <p className="mt-3 text-lg text-gray-600">
+            Discover our amazing collection
+          </p>
+        </div>
+        <ProductCard />
+      </main>
+    </>
+  ) : (
+    <>
+      <div className="text-center mt-16">
+        <h1 className="text-5xl font-extrabold text-gray-900">
+          Welcome to Home Stay
+        </h1>
+        <p className="mt-4 text-xl text-gray-600">
+          Find the Product
+        </p>
       </div>
+    </>
+  )}
+</div>
+
     </>
   )
 }
