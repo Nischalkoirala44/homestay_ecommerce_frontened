@@ -1,19 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { FiHome, FiShoppingCart, FiUser, FiLogIn, FiLogOut } from "react-icons/fi";
 import { FaProductHunt } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
 import { useRouter } from "next/navigation";
-import CartSummaryPage from "../components/CartItem";
+import CartSummaryPage from "./CartSummaryPage";
+import { useCart } from "../hooks/useCart";
 
 export default function Header() {
   const { user, logout } = useAuth();
   const router = useRouter();
   const [isCartOpen, setCartOpen] = useState(false);
-  const [cartItems] = useState(3); // Example cart items count
 
+  const { cartCount } = useCart(); // Get live cart count
+
+  // Prevent scrolling when cart is open
   useEffect(() => {
     document.body.style.overflow = isCartOpen ? "hidden" : "";
   }, [isCartOpen]);
@@ -81,9 +84,9 @@ export default function Header() {
               className="flex items-center hover:text-blue-300 transition relative"
             >
               <FiShoppingCart className="mr-1" /> Cart
-              {cartItems > 0 && (
+              {cartCount > 0 && (
                 <span className="absolute -top-2 -right-5 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {cartItems}
+                  {cartCount}
                 </span>
               )}
             </button>
@@ -108,7 +111,7 @@ export default function Header() {
         className={`fixed top-0 right-0 h-full bg-white shadow-2xl z-50 transform transition-transform duration-300
           ${isCartOpen ? "translate-x-0" : "translate-x-full"}
           w-96 max-w-full`}
-        style={{ minWidth: "380px" }}
+        style={{ minWidth: "510px" }}
       >
         <CartSummaryPage onClose={() => setCartOpen(false)} />
       </aside>
