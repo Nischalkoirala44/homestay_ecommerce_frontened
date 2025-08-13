@@ -1,16 +1,22 @@
 const API_URL = process.env.NEXT_PUBLIC_URL || "http://localhost:3005";
 import { Product } from "../types/Product";
 
-export const fetchProducts = async (): Promise<Product[]> => {
-    const res = await fetch(`${API_URL}/api/products`, { method: "GET" });
+export const fetchProducts = async (search?: string): Promise<Product[]> => {
+  let url = `${API_URL}/api/products`;
+  if (search) url += `?search=${encodeURIComponent(search)}`;
 
-    if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "Failed to fetch product");
-    }
-    
+  const res = await fetch(url);
 
-    const json = await res.json();
-    return json.data as Product[];
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.message || "Failed to fetch products");
+  }
+
+  const json = await res.json();
+  return json.data as Product[];
 };
+
+
+
+
 
