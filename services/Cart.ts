@@ -56,13 +56,3 @@ export interface CartItemType {
     image?: string;
   };
 }
-
-export const fetchCartItems = async (userId: number): Promise<CartItemType[]> => {
-  const res = await fetch(`${API_URL}/api/products/${userId}/items`);
-  if (!res.ok) {
-    const errorData = await res.json().catch(() => null);
-    throw new Error(errorData?.message || "Failed to fetch cart items");
-  }
-  const data = await res.json();
-  return data.data || [];
-};
