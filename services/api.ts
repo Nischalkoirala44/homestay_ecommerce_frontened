@@ -6,6 +6,13 @@ interface LoginData {
     rememberMe: boolean;
 }
 
+interface ContactData {
+    fullName: string;
+    email: string;
+    phone: string;
+    message: string;
+}
+
 interface RegisterData {
     fullName: string;
     email: string;
@@ -79,3 +86,4 @@ export const getUserDetails = async () => {
         throw err;
     }
 };
+

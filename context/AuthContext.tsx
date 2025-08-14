@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { getUserDetails } from "../services/api";
 
 interface User {
+    [x: string]: any;
     fullName: string;
     email: string;
     role: string;
