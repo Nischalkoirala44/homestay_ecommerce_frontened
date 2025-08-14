@@ -87,3 +87,32 @@ export const getUserDetails = async () => {
     }
 };
 
+// Add these functions
+export const submitContactForm = async (data: ContactData) => {
+    const response = await fetch(`${API_URL}/contact`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+        throw new Error("Failed to submit contact form");
+    }
+
+    return await response.json();
+};
+
+export const getAllContacts = async () => {
+    const response = await fetch(`${API_URL}/contact`, {
+        method: "GET",
+        credentials: "include",
+    });
+
+    if (!response.ok) {
+        throw new Error("Failed to fetch contacts");
+    }
+
+    return await response.json();
+};
