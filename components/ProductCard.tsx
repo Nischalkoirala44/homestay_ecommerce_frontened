@@ -8,7 +8,11 @@ import type { Product } from "../types/Product";
 import { Loader2, Search } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
-const ProductCard = () => {
+interface ProductCardProps {
+  limit?: number;
+}
+
+const ProductCard = ({ limit }: ProductCardProps) => {
   const { user, loading: authLoading } = useAuth();
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -16,12 +20,11 @@ const ProductCard = () => {
   const [addingToCart, setAddingToCart] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Load all products on mount
   useEffect(() => {
     const getProducts = async () => {
       setLoading(true);
       try {
-        const response = await fetchProducts(); // no search term
+        const response = await fetchProducts();
         setAllProducts(response);
       } catch (err: any) {
         setError(err.message);
@@ -32,15 +35,15 @@ const ProductCard = () => {
     getProducts();
   }, []);
 
-  // Filter products on the client
   const filteredProducts = useMemo(() => {
     const lowerSearch = searchTerm.toLowerCase();
-    return allProducts.filter(
+    const filtered = allProducts.filter(
       (p) =>
         p.name.toLowerCase().includes(lowerSearch) ||
         p.description.toLowerCase().includes(lowerSearch)
     );
-  }, [allProducts, searchTerm]);
+    return limit ? filtered.slice(0, limit) : filtered;
+  }, [allProducts, searchTerm, limit]);
 
   const handleAddToCart = async (productId: number) => {
     if (!user) {
@@ -91,20 +94,21 @@ const ProductCard = () => {
 
   return (
     <div className="p-4">
-      {/* Search bar */}
-      <div className="flex items-center gap-2 mb-6 border rounded-lg px-3 py-2 max-w-md mx-auto bg-white shadow-sm">
-        <Search className="w-5 h-5 text-gray-500" />
-        <input
-          type="text"
-          placeholder="Search products..."
-          className="w-full focus:outline-none text-sm"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
+      {/* Only show search bar when not limited */}
+      {!limit && (
+        <div className="flex items-center gap-2 mb-6 border rounded-lg px-3 py-2 max-w-md mx-auto text-black bg-white shadow-sm">
+          <Search className="w-5 h-5 text-gray-500" />
+          <input
+            type="text"
+            placeholder="Search products..."
+            className="w-full focus:outline-none text-sm"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+      )}
 
-      {/* Products grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {filteredProducts.length > 0 ? (
           filteredProducts.map((product) => (
             <div

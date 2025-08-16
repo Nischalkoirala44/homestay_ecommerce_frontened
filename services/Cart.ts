@@ -43,16 +43,3 @@ export const fetchCartItems = async (userId: number): Promise<CartItemType[]> =>
   const data = await res.json();
   return data.data || [];
 };
-
-export interface CartItemType {
-  id: number;
-  cartId: number;
-  productId: number;
-  quantity: number;
-  product: {
-    id: number;
-    name: string;
-    price: number;
-    image?: string;
-  };
-}
