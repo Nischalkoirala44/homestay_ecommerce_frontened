@@ -3,6 +3,8 @@
 "use client";
 
 import { useState } from "react";
+import { CheckoutPayload, OrderResponse } from "../types/Checkout";
+import { checkout } from "../services/Checkout";
 
 interface CheckoutFormProps {
     userId: number;
@@ -11,7 +13,7 @@ interface CheckoutFormProps {
 }
 
 const CheckoutForm = ({ userId, onClose, onSuccess }: CheckoutFormProps) => {
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<CheckoutPayload>({
         userId: Number(userId),
         fullName: "",
         email: "",
@@ -28,6 +30,25 @@ const CheckoutForm = ({ userId, onClose, onSuccess }: CheckoutFormProps) => {
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+
+        try {
+            const order: OrderResponse = await checkout({
+                ...formData,
+                userId: Number(userId),
+            });
+
+            alert(order.message);
+            onClose();
+            onSuccess();
+        } catch (err: any) {
+            alert(err.message || "Checkout failed");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg max-w-md w-full p-6 relative">

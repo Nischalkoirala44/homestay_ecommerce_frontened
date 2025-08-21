@@ -1,3 +1,5 @@
+//CartSummaryPage.tsx
+
 "use client";
 
 import CartPage from "./CartItem";
@@ -5,9 +7,10 @@ import { useCart } from "../hooks/useCart";
 
 interface CartSummaryPageProps {
   onClose: () => void;
+  userId: number;
 }
 
-const CartSummaryPage = ({ onClose }: CartSummaryPageProps) => {
+const CartSummaryPage = ({ onClose, userId }: CartSummaryPageProps) => {
   const { cartItems, loading, error, increaseQuantity, decreaseQuantity, clearCart } = useCart();
 
   if (loading) return <p className="text-center mt-20">Loading your cart...</p>;
@@ -19,7 +22,6 @@ const CartSummaryPage = ({ onClose }: CartSummaryPageProps) => {
         cartItems={cartItems}
         onClearCart={clearCart}
         onClose={onClose}
-
         onIncrease={increaseQuantity}
         onDecrease={decreaseQuantity}
       />

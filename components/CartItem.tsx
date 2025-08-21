@@ -1,6 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { CartItemType } from "../services/Cart";
+import CheckoutForm from "./CheckoutForm";
+import { useAuth } from "../context/AuthContext";
 
 interface CartPageProps {
   cartItems: CartItemType[];
@@ -10,7 +13,16 @@ interface CartPageProps {
   onDecrease: (id: number) => void;
 }
 
-const CartPage = ({ cartItems, onClearCart, onClose, onIncrease, onDecrease }: CartPageProps) => {
+const CartPage = ({
+  cartItems,
+  onClearCart,
+  onClose,
+  onIncrease,
+  onDecrease,
+}: CartPageProps) => {
+  const [showCheckout, setShowCheckout] = useState(false);
+  const { user } = useAuth();
+
   if (cartItems.length === 0)
     return (
       <div className="text-center text-gray-600 mt-20 text-lg px-4">
@@ -25,10 +37,12 @@ const CartPage = ({ cartItems, onClearCart, onClose, onIncrease, onDecrease }: C
       {/* Header */}
       <header className="flex items-center justify-between px-4 sm:px-6 py-3 border-b">
         <h2 className="text-xl font-semibold">Your Jhola</h2>
-        <button onClick={onClose} aria-label="Close cart" className="text-gray-500 hover:text-gray-700 p-1">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
+        <button
+          onClick={onClose}
+          aria-label="Close cart"
+          className="text-gray-500 hover:text-gray-700 p-1"
+        >
+          ✕
         </button>
       </header>
 
@@ -47,8 +61,12 @@ const CartPage = ({ cartItems, onClearCart, onClose, onIncrease, onDecrease }: C
               />
             )}
             <div className="flex flex-col flex-1 w-full">
-              <h3 className="text-base sm:text-lg font-semibold text-gray-900 line-clamp-2 mb-1">{item.product.name}</h3>
-              <p className="text-lg font-bold text-gray-900 mb-3">{formatPrice(item.product.price)}</p>
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 line-clamp-2 mb-1">
+                {item.product.name}
+              </h3>
+              <p className="text-lg font-bold text-gray-900 mb-3">
+                {formatPrice(item.product.price)}
+              </p>
               <div className="flex items-center space-x-3">
                 <button
                   onClick={() => onDecrease(item.id)}
@@ -57,7 +75,9 @@ const CartPage = ({ cartItems, onClearCart, onClose, onIncrease, onDecrease }: C
                 >
                   –
                 </button>
-                <span className="text-gray-800 font-semibold min-w-[2rem] text-center">{item.quantity}</span>
+                <span className="text-gray-800 font-semibold min-w-[2rem] text-center">
+                  {item.quantity}
+                </span>
                 <button
                   onClick={() => onIncrease(item.id)}
                   className="w-8 h-8 rounded-full border border-gray-300 text-gray-600 hover:bg-gray-200 flex items-center justify-center font-medium"
@@ -76,7 +96,12 @@ const CartPage = ({ cartItems, onClearCart, onClose, onIncrease, onDecrease }: C
         <div className="flex justify-between text-gray-700 mb-2 sm:mb-3 text-base sm:text-lg">
           <span>Subtotal</span>
           <span className="font-semibold">
-            {formatPrice(cartItems.reduce((acc, i) => acc + i.product.price * i.quantity, 0))}
+            {formatPrice(
+              cartItems.reduce(
+                (acc, i) => acc + i.product.price * i.quantity,
+                0
+              )
+            )}
           </span>
         </div>
         <div className="flex justify-between text-gray-700 mb-2 sm:mb-4 text-base sm:text-lg">
@@ -85,12 +110,19 @@ const CartPage = ({ cartItems, onClearCart, onClose, onIncrease, onDecrease }: C
         </div>
         <div className="flex justify-between font-bold text-lg sm:text-xl mb-4 sm:mb-6 border-t pt-3">
           <span>Total</span>
-          <span>{formatPrice(cartItems.reduce((acc, i) => acc + i.product.price * i.quantity, 0))}</span>
+          <span>
+            {formatPrice(
+              cartItems.reduce(
+                (acc, i) => acc + i.product.price * i.quantity,
+                0
+              )
+            )}
+          </span>
         </div>
 
         <button
           className="w-full bg-orange-600 text-white py-3 rounded-lg hover:bg-orange-700 transition font-semibold text-lg mb-3"
-          onClick={() => alert("Proceed to checkout")}
+          onClick={() => setShowCheckout(true)}
         >
           Checkout →
         </button>
@@ -102,6 +134,18 @@ const CartPage = ({ cartItems, onClearCart, onClose, onIncrease, onDecrease }: C
           Clear Jhola
         </button>
       </div>
+
+      {/* Checkout Form Modal */}
+      {showCheckout &&
+        (user ? (
+          <CheckoutForm
+            userId={user.id}
+            onClose={() => setShowCheckout(false)}
+            onSuccess={onClearCart}
+          />
+        ) : (
+          <p className="text-red-500 p-4">You must be logged in to checkout.</p>
+        ))}
     </div>
   );
 };
