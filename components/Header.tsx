@@ -110,7 +110,7 @@ export default function Header() {
           w-96 max-w-full`}
         style={{ minWidth: "510px" }}
       >
-        <CartSummaryPage onClose={() => setCartOpen(false)} />
+        <CartSummaryPage onClose={() => setCartOpen(false)} userId={user?.id} />
       </aside>
     </>
   );

@@ -108,7 +108,7 @@ const CartPage = ({
           <span>Shipping</span>
           <span className="font-semibold text-green-600">Free</span>
         </div>
-        <div className="flex justify-between font-bold text-lg sm:text-xl mb-4 sm:mb-6 border-t pt-3">
+        <div className="flex justify-between font-bold text-lg sm:text-xl text-black mb-4 sm:mb-6 border-t pt-3">
           <span>Total</span>
           <span>
             {formatPrice(

@@ -44,8 +44,9 @@ export const fetchCartItems = async (userId: number): Promise<CartItemType[]> =>
     return data.data || [];
 };
 
+// services/Checkout.ts
 export const checkout = async (checkoutData: any): Promise<any> => {
-    const response = await fetch(`${API_URL}/api/checkout`, {
+    const response = await fetch(`${API_URL}/api/products/checkout`, { // Changed endpoint
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
