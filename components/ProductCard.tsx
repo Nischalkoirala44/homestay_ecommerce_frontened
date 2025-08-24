@@ -5,26 +5,29 @@ import Image from "next/image";
 import { fetchProducts } from "../services/Product";
 import { addToCart } from "../services/Cart";
 import type { Product } from "../types/Product";
-import { Loader2, Search } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { useSearchParams } from "next/navigation";
 
 interface ProductCardProps {
   limit?: number;
+  selectedCategory?: number | null;
 }
 
-const ProductCard = ({ limit }: ProductCardProps) => {
+const ProductCard = ({ limit, selectedCategory }: ProductCardProps) => {
   const { user, loading: authLoading } = useAuth();
+  const searchParams = useSearchParams();
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [addingToCart, setAddingToCart] = useState<number | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const getProducts = async () => {
       setLoading(true);
       try {
-        const response = await fetchProducts();
+        const searchTerm = searchParams.get('search') || undefined;
+        const response = await fetchProducts(searchTerm);
         setAllProducts(response);
       } catch (err: any) {
         setError(err.message);
@@ -33,17 +36,21 @@ const ProductCard = ({ limit }: ProductCardProps) => {
       }
     };
     getProducts();
-  }, []);
+  }, [searchParams]);
 
   const filteredProducts = useMemo(() => {
-    const lowerSearch = searchTerm.toLowerCase();
-    const filtered = allProducts.filter(
-      (p) =>
-        p.name.toLowerCase().includes(lowerSearch) ||
-        p.description.toLowerCase().includes(lowerSearch)
-    );
+    let filtered = allProducts;
+
+    // Filter by category if selected
+    if (selectedCategory) {
+      filtered = filtered.filter(product => 
+        product.categoryId === selectedCategory
+      );
+    }
+
+    // Apply limit if specified
     return limit ? filtered.slice(0, limit) : filtered;
-  }, [allProducts, searchTerm, limit]);
+  }, [allProducts, selectedCategory, limit]);
 
   const handleAddToCart = async (productId: number) => {
     if (!user) {
@@ -94,20 +101,6 @@ const ProductCard = ({ limit }: ProductCardProps) => {
 
   return (
     <div className="p-4">
-      {/* Only show search bar when not limited */}
-      {!limit && (
-        <div className="flex items-center gap-2 mb-6 border rounded-lg px-3 py-2 max-w-md mx-auto text-black bg-white shadow-sm">
-          <Search className="w-5 h-5 text-gray-500" />
-          <input
-            type="text"
-            placeholder="Search products..."
-            className="w-full focus:outline-none text-sm"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-      )}
-
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {filteredProducts.length > 0 ? (
           filteredProducts.map((product) => (
@@ -127,20 +120,20 @@ const ProductCard = ({ limit }: ProductCardProps) => {
               </div>
 
               <div className="p-4 flex flex-col flex-grow border-t">
-                <p className="text-gray-500 text-sm mb-1">{product.name}</p>
-                <h3
-                  className="text-lg font-semibold text-gray-800 mb-2 line-clamp-2"
-                  title={product.description}
-                >
-                  {product.description}
+                <p className="text-gray-500 text-sm mb-1">{product.category?.name}</p>
+                <h3 className="text-lg font-semibold text-gray-800 mb-2 line-clamp-2">
+                  {product.name}
                 </h3>
+                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                  {product.description}
+                </p>
                 <div className="text-gray-800 font-medium text-lg mb-4">
                   Rs. {product.price.toLocaleString()}
                 </div>
                 <button
                   onClick={() => handleAddToCart(Number(product.id))}
                   disabled={addingToCart === Number(product.id)}
-                  className="mt-auto w-full border border-green-400 rounded-b-sm bg-green-400 text-white font-medium py-2 px-4"
+                  className="mt-auto w-full border border-green-400 rounded-b-sm bg-green-400 text-white font-medium py-2 px-4 hover:bg-green-500 transition-colors disabled:opacity-50"
                 >
                   {addingToCart === Number(product.id) ? "Adding..." : "Add to cart"}
                 </button>
@@ -148,8 +141,9 @@ const ProductCard = ({ limit }: ProductCardProps) => {
             </div>
           ))
         ) : (
-          <div className="col-span-full text-center text-gray-500">
-            No products found
+          <div className="col-span-full text-center text-gray-500 py-12">
+            <div className="text-2xl mb-2">No products found</div>
+            <p className="text-gray-600">Try adjusting your search or filter criteria</p>
           </div>
         )}
       </div>

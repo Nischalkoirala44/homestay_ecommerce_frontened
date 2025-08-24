@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { FiHome, FiShoppingCart, FiUser, FiLogIn, FiLogOut } from "react-icons/fi";
+import { FiHome, FiShoppingCart, FiUser, FiLogIn, FiLogOut, FiSearch } from "react-icons/fi";
 import { FaProductHunt } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
 import { useRouter } from "next/navigation";
@@ -13,13 +13,22 @@ export default function Header() {
   const { user, logout } = useAuth();
   const router = useRouter();
   const [isCartOpen, setCartOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
 
-  const { cartCount } = useCart(); // Get live cart count
+  const { cartCount } = useCart();
 
-  // Prevent scrolling when cart is open
   useEffect(() => {
     document.body.style.overflow = isCartOpen ? "hidden" : "";
   }, [isCartOpen]);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      router.push(`/products?search=${encodeURIComponent(searchTerm.trim())}`);
+      setSearchTerm("");
+    }
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -34,6 +43,26 @@ export default function Header() {
             HomeStay Store
           </Link>
 
+          {/* Search Bar */}
+          <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-md mx-8">
+            <div className="relative w-full">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <FiSearch className="w-5 h-5 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                placeholder="Search products..."
+                className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 ${
+                  isSearchFocused ? 'bg-white text-black' : 'bg-gray-700 text-white border-gray-600'
+                }`}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onFocus={() => setIsSearchFocused(true)}
+                onBlur={() => setIsSearchFocused(false)}
+              />
+            </div>
+          </form>
+
           <nav className="hidden md:flex space-x-8">
             <Link href="/" className="flex items-center hover:text-blue-300 transition">
               <FiHome className="mr-1" /> Home
@@ -47,20 +76,21 @@ export default function Header() {
           </nav>
 
           <div className="flex items-center space-x-4">
+            {/* Mobile Search Button */}
+            <button
+              onClick={() => router.push('/products')}
+              className="md:hidden p-2 hover:text-blue-300 transition"
+            >
+              <FiSearch className="w-5 h-5" />
+            </button>
+
             {user ? (
-              <div className="relative group">
-                <button className="flex items-center hover:text-blue-300 transition">
-                  <FiUser className="mr-1" /> Profile
-                </button>
-                <div className="absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded-md shadow-lg py-1 z-10 hidden group-hover:block">
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center"
-                  >
-                    <FiLogOut className="mr-2" /> Logout
-                  </button>
-                </div>
-              </div>
+              <button
+                onClick={handleLogout}
+                className="flex items-center hover:text-blue-300 transition"
+              >
+                <FiLogOut className="mr-1" /> Logout
+              </button>
             ) : (
               <>
                 <Link href="/login" className="flex items-center hover:text-blue-300 transition">
@@ -75,7 +105,6 @@ export default function Header() {
               </>
             )}
 
-            {/* Cart Button */}
             <button
               onClick={() => setCartOpen(true)}
               className="flex items-center hover:text-blue-300 transition relative"
